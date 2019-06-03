@@ -39,13 +39,13 @@ export default {
   props: {
     seller: {
       type: Object,
-      default () {
+      default() {
         return {}
       }
     }
   },
   methods: {
-    showDetail () {
+    showDetail() {
       this.headerDetailComp =
         this.headerDetailComp ||
         this.$createHeaderDetail({

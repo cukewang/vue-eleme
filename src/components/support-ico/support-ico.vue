@@ -4,7 +4,9 @@
 
 <script>
 export default {
+  // 组件名称
   name: 'support-ico',
+  // 组件传入的对象
   props: {
     size: {
       type: Number
@@ -14,6 +16,7 @@ export default {
     }
   },
   computed: {
+    // 根据传入的值 然后输出个计算属性，然后返回到绑定的class上去，根据下面的css文件确定背景图片，从而搞出来一个很方便的图标。
     iconCls () {
       const classMap = [
         'decrease',
@@ -22,6 +25,7 @@ export default {
         'invoice',
         'guarantee'
       ]
+      // 这个是符号拼接符，在``里面填入正常的字符，然后用${}里面添加动态的东西。
       return `icon-${this.size} ${classMap[this.type]}`
     }
   }
