@@ -5,7 +5,9 @@
     // 至于为什么要在App.vue页面里传入而不是直接在组件里获取是因为一会这个页面上其他的页面也需要被传入seller数据进去，省了重复太多次获取了。-->
     <v-header :seller="seller"></v-header>
     <!-- <header-detail :seller="seller"></header-detail> -->
-    <tab></tab>
+    <div class="tap-wapper">
+      <tab :tabs="tabs"></tab>
+    </div>
   </div>
 </template>
 
@@ -13,6 +15,9 @@
 // 第一步 引入组件， 注意组件变量最好用驼峰表示法表示
 import VHeader from 'components/v-header/v-header'
 // import HeaderDetail from 'components/header-detail/header-detail'
+import Goods from 'components/goods/goods'
+import Seller from 'components/seller/seller'
+import Ratings from 'components/ratings/ratings'
 import { getSeller } from 'api'
 import Tab from 'components/tab/tab'
 
@@ -21,6 +26,33 @@ export default {
   data () {
     return {
       seller: {}
+    }
+  },
+  computed: {
+    tabs () {
+      return [
+        {
+          label: '商品',
+          component: Goods,
+          data: {
+            seller: this.seller
+          }
+        },
+        {
+          label: '评价',
+          component: Ratings,
+          data: {
+            seller: this.seller
+          }
+        },
+        {
+          label: '商家',
+          component: Seller,
+          data: {
+            seller: this.seller
+          }
+        }
+      ]
     }
   },
   created () {
@@ -41,4 +73,12 @@ export default {
   }
 }
 </script>
-<style lang="stylus"></style>
+<style lang="stylus">
+#app
+  .tap-wapper
+    position: fixed
+    top: 136px
+    bottom: 0
+    left: 0
+    right: 0
+</style>
