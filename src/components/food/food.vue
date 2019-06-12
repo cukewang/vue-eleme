@@ -32,6 +32,32 @@
             <p class="text">{{food.info}}</p>
           </div>
           <split></split>
+          <div class="rating">
+            <h1 class="title">商品评价</h1>
+
+            <div class="rating-wrapper">
+              <ul v-show="ratings && ratings.length">
+                <li
+                  v-for="(rating,index) in ratings"
+                  class="rating-item border-bottom-1px"
+                  :key="index"
+                >
+                  <div class="user">
+                    <span class="name">{{rating.username}}</span>
+                    <img class="avatar" width="12" height="12" :src="rating.avatar">
+                  </div>
+                  <div class="time">{{format(rating.rateTime)}}</div>
+                  <p class="text">
+                    <span
+                      :class="{'icon-thumb_up':rating.rateType===0,'icon-thumb_down':rating.rateType===1}"
+                    ></span>
+                    {{rating.text}}
+                  </p>
+                </li>
+              </ul>
+              <div class="no-rating" v-show="!ratings || !ratings.length">暂无评价</div>
+            </div>
+          </div>
         </div>
       </cube-scroll>
     </div>
@@ -42,6 +68,7 @@
 import popupMixin from 'common/mixins/popup'
 import Split from 'components/split/split'
 import CartControl from 'components/cart-control/cart-control'
+import moment from 'moment'
 const EVENT_SHOW = 'show'
 const EVENT_LEAVE = 'leave'
 const EVENT_ADD = 'add'
@@ -60,6 +87,11 @@ export default {
       })
     })
   },
+  computed: {
+    ratings () {
+      return this.food.ratings
+    }
+  },
   methods: {
     onLeave () {
       this.$emit(EVENT_LEAVE)
@@ -70,6 +102,9 @@ export default {
     },
     addFood (target) {
       this.$emit(EVENT_ADD, target)
+    },
+    format (time) {
+      return moment(time).format('YYYY-MM-DD')
     }
   },
   components: {
