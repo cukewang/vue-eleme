@@ -142,11 +142,13 @@ export default {
       this._showFood()
     },
     _showFood () {
-      this.foodComp = this.$createFood({
-        $props: {
-          food: 'selectedFood'
-        }
-      })
+      this.foodComp =
+        this.foodComp ||
+        this.$createFood({
+          $props: {
+            food: 'selectedFood'
+          }
+        })
       this.foodComp.show()
     }
   },
