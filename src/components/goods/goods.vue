@@ -2,6 +2,25 @@
   <div class="goods">
     <div class="scroll-nav-wrapper">
       <cube-scroll-nav :side="true" :data="goods" :options="scrollOptions" v-if="goods.length">
+        <template v-slot:bar="props">
+          <cube-scroll-nav-bar
+            direction="vertical"
+            :current="props.current"
+            :labels="props.labels"
+            :txts="barTxts"
+          >
+            <template v-slot="props">
+              <div class="text">
+                <support-ico v-if="props.txt.type>=1" :size="3" :type="props.txt.type"></support-ico>
+                <span>{{props.txt.name}}</span>
+                <span class="num" v-if="props.txt.count">
+                  <bubble :num="props.txt.count"></bubble>
+                </span>
+              </div>
+            </template>
+          </cube-scroll-nav-bar>
+        </template>
+
         <cube-scroll-nav-panel
           v-for="good in goods"
           :key="good.name"
@@ -9,7 +28,12 @@
           :title="good.name"
         >
           <ul>
-            <li v-for="food in good.foods" :key="food.name" class="food-item">
+            <li
+              @click="selectFood(food)"
+              v-for="food in good.foods"
+              :key="food.name"
+              class="food-item"
+            >
               <div class="icon">
                 <img width="57" height="57" :src="food.icon">
               </div>
@@ -25,7 +49,7 @@
                   <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                 </div>
                 <div class="cart-control-wrapper">
-                  <cart-control :food="food"></cart-control>
+                  <cart-control @add="onAdd" :food="food"></cart-control>
                 </div>
               </div>
             </li>
@@ -35,6 +59,7 @@
     </div>
     <div class="shop-cart-wrapper">
       <shop-cart
+        ref="shopCart"
         :selectFoods="selectFoods"
         :deliveryPrice="seller.deliveryPrice"
         :minPrice="seller.minPrice"
@@ -47,6 +72,8 @@
 import { getGoods } from 'api'
 import ShopCart from '../shop-cart/shop-cart'
 import CartControl from '../cart-control/cart-control'
+import Bubble from '../bubble/bubble'
+import SupportIco from '../support-ico/support-ico'
 // import Bubble from '../bubble/bubble'
 
 export default {
@@ -64,7 +91,8 @@ export default {
       goods: [],
       scrollOptions: {
         click: false,
-        directionLockThreshold: 0
+        directionLockThreshold: 0,
+        selectedFood: {}
       }
     }
   },
@@ -82,6 +110,22 @@ export default {
         })
       })
       return ret
+    },
+    barTxts () {
+      let ret = []
+      this.goods.forEach(good => {
+        const { foods, type, name } = good
+        let count = 0
+        foods.forEach(food => {
+          count += food.count || 0
+        })
+        ret.push({
+          name,
+          type,
+          count
+        })
+      })
+      return ret
     }
   },
   methods: {
@@ -89,11 +133,28 @@ export default {
       getGoods().then(goods => {
         this.goods = goods
       })
+    },
+    onAdd (el) {
+      this.$refs.shopCart.drop(el)
+    },
+    selectFood (food) {
+      this.selectedFood = food
+      this._showFood()
+    },
+    _showFood () {
+      this.foodComp = this.$createFood({
+        $props: {
+          food: 'selectedFood'
+        }
+      })
+      this.foodComp.show()
     }
   },
   components: {
     ShopCart,
-    CartControl
+    CartControl,
+    Bubble,
+    SupportIco
   }
 }
 </script>
