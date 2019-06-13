@@ -34,11 +34,18 @@
           <split></split>
           <div class="rating">
             <h1 class="title">商品评价</h1>
-
+            <rating-select
+              :ratings="ratings"
+              :onlyContent="onlyContent"
+              :selectType="selectType"
+              :desc="desc"
+              @select="onSelectType"
+              @toggle="onToggle"
+            ></rating-select>
             <div class="rating-wrapper">
-              <ul v-show="ratings && ratings.length">
+              <ul v-show="computedRatings && computedRatings.length">
                 <li
-                  v-for="(rating,index) in ratings"
+                  v-for="(rating,index) in computedRatings"
                   class="rating-item border-bottom-1px"
                   :key="index"
                 >
@@ -55,7 +62,7 @@
                   </p>
                 </li>
               </ul>
-              <div class="no-rating" v-show="!ratings || !ratings.length">暂无评价</div>
+              <div class="no-rating" v-show="!computedRatings || !computedRatings.length">暂无评价</div>
             </div>
           </div>
         </div>
@@ -68,16 +75,29 @@
 import popupMixin from 'common/mixins/popup'
 import Split from 'components/split/split'
 import CartControl from 'components/cart-control/cart-control'
+import RatingSelect from 'components/rating-select/rating-select'
 import moment from 'moment'
 const EVENT_SHOW = 'show'
 const EVENT_LEAVE = 'leave'
 const EVENT_ADD = 'add'
+const ALL = 2
 export default {
   name: 'food',
   mixins: [popupMixin],
   props: {
     food: {
       type: Object
+    }
+  },
+  data () {
+    return {
+      onlyContent: true,
+      selectType: ALL,
+      desc: {
+        all: '全部',
+        positive: '推荐',
+        negative: '吐槽'
+      }
     }
   },
   created () {
@@ -90,6 +110,18 @@ export default {
   computed: {
     ratings () {
       return this.food.ratings
+    },
+    computedRatings () {
+      let ret = []
+      this.ratings.forEach(rating => {
+        if (this.onlyContent && !rating.text) {
+          return
+        }
+        if (this.selectType === ALL || rating.rateType === this.selectType) {
+          ret.push(rating)
+        }
+      })
+      return ret
     }
   },
   methods: {
@@ -105,11 +137,18 @@ export default {
     },
     format (time) {
       return moment(time).format('YYYY-MM-DD')
+    },
+    onSelectType (type) {
+      this.selectType = type
+    },
+    onToggle () {
+      this.onlyContent = !this.onlyContent
     }
   },
   components: {
     Split,
-    CartControl
+    CartControl,
+    RatingSelect
   }
 }
 </script>
